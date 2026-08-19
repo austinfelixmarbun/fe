@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using LodgingReservation_BE.Models.Enum;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LodgingReservation_BE.Models
@@ -37,7 +38,7 @@ namespace LodgingReservation_BE.Models
         [Required] 
         [StringLength(20)]
         [Column("STATUS")]
-        public ReservationStatus Status { get; set; } 
+        public Enum.ReservationStatus Status { get; set; } 
 
         [Required]
         [Column("TOTAL_NIGHTS")]

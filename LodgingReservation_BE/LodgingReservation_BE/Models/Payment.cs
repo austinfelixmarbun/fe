@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using LodgingReservation_BE.Models.Enum;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LodgingReservation_BE.Models
@@ -25,10 +26,10 @@ namespace LodgingReservation_BE.Models
         public decimal AmountPaid { get; set; }
 
         [Required]
-        public PaymentMethod PaymentMethod { get; set; }
+        public Enum.PaymentMethod PaymentMethod { get; set; }
 
         [Required]
-        public PaymentStatus PaymentStatus { get; set; }
+        public Enum.PaymentStatus PaymentStatus { get; set; }
 
 
     }
