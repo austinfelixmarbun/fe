@@ -8,7 +8,7 @@ namespace LodgingReservation_BE.Models
     public class Payment
     {
         [Key]
-        public int Id { get; set; }
+        public long Id { get; set; }
 
         [Required]
         [Column("RESERVATION_ID")]
@@ -30,7 +30,6 @@ namespace LodgingReservation_BE.Models
 
         [Required]
         public Enum.PaymentStatus Status { get; set; }
-        public ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
 
 
     }

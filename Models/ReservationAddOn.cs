@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LodgingReservation_BE.Models
 {
-    public class ReservationAddOns
+    public class ReservationAddOn
     {
         [Key]
         public long Id { get; set; }
