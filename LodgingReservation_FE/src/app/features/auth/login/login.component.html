@@ -16,7 +16,7 @@
           id="email"
           type="email"
           formControlName="email"
-          placeholder="nama@email.com"
+          placeholder="user@email.com"
           [class.invalid]="
             loginForm.get('email')?.invalid && loginForm.get('email')?.touched
           "
@@ -38,7 +38,7 @@
 
       <div class="form-group">
         <label for="password">Password</label>
-        <div class="password-wrapper">
+        <div class="">
           <input
             id="password"
             [type]="showPassword ? 'text' : 'password'"
@@ -49,17 +49,15 @@
               loginForm.get('password')?.touched
             "
           />
-          <button
-            type="button"
-            class="btn-toggle-pass"
-            (click)="togglePasswordVisibility()"
-            tabindex="-1"
-            [attr.aria-label]="
-              showPassword ? 'Sembunyikan password' : 'Lihat password'
-            "
-          >
-            {{ showPassword ? "🙈" : "👁️" }}
-          </button>
+          <input 
+            id="password"
+            [type]="showPassword ? 'text' : 'password'"
+            formControlName="password"
+            placeholder=""
+
+          />
+
+          
         </div>
         <small
           *ngIf="

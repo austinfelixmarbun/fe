@@ -16,4 +16,5 @@ import { LoginComponent } from './features/auth/login/login.component'; // 1. Im
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent {}
+export class AppComponent {
+}
