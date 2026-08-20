@@ -18,10 +18,6 @@ namespace LodgingReservation_BE.Models
         [Column("DISCOUNT_PERCENTAGE", TypeName = "decimal(5,2)")]
         public decimal DiscountPercentage { get; set; }
 
-        [Required] 
-        [Column("MAX_DISCOUNT_CAP", TypeName = "decimal(12,2)")]
-        public decimal MaxDiscountCap { get; set; }
-
         [Required]
         [Column("VALID_UNTIL")]
         public DateTime ValidUntil { get; set; }

@@ -26,11 +26,9 @@ namespace LodgingReservation_BE.Models
         public decimal AmountPaid { get; set; }
 
         [Required]
-        [Column("METHOD")]
         public Enum.PaymentMethod Method { get; set; }
 
         [Required]
-        [Column("STATUS")]
         public Enum.PaymentStatus Status { get; set; }
 
 

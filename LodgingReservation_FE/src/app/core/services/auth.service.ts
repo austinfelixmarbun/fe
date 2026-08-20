@@ -7,11 +7,10 @@ import { LoginRequest, LoginResponse } from '../../shared/models/auth.model';
   providedIn: 'root',
 })
 export class AuthService {
-  // Simulasi HTTP POST /api/auth/login
+  
   login(credentials: LoginRequest): Observable<LoginResponse> {
     const { email, password } = credentials;
 
-    // Skenario 1: Admin
     if (email === 'admin@stayhub.com' && password === 'password123') {
       const mockAdmin: LoginResponse = {
         token: 'mock-jwt-token-admin-12345',
@@ -20,12 +19,11 @@ export class AuthService {
         userId: 1,
       };
       return of(mockAdmin).pipe(
-        delay(800), // Memberi efek loading realistis
+        delay(800),
         tap((res) => this.saveSession(res)),
       );
     }
 
-    // Skenario 2: Customer
     if (email === 'customer@stayhub.com' && password === 'password123') {
       const mockCustomer: LoginResponse = {
         token: 'mock-jwt-token-customer-67890',
@@ -39,7 +37,6 @@ export class AuthService {
       );
     }
 
-    // Skenario 3: Kredensial Salah
     return throwError(() => ({
       error: {
         message:

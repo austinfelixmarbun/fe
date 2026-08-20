@@ -17,7 +17,7 @@ namespace LodgingReservation_BE.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.30")
+                .HasAnnotation("ProductVersion", "8.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -69,8 +69,7 @@ namespace LodgingReservation_BE.Migrations
 
                     b.Property<string>("Method")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("METHOD");
+                        .HasColumnType("text");
 
                     b.Property<long>("ReservationId")
                         .HasColumnType("bigint")
@@ -78,8 +77,7 @@ namespace LodgingReservation_BE.Migrations
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("STATUS");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -106,10 +104,6 @@ namespace LodgingReservation_BE.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean")
                         .HasColumnName("IS_ACTIVE");
-
-                    b.Property<decimal>("MaxDiscountCap")
-                        .HasColumnType("decimal(12,2)")
-                        .HasColumnName("MAX_DISCOUNT_CAP");
 
                     b.Property<string>("PromoCode")
                         .IsRequired()
@@ -172,6 +166,9 @@ namespace LodgingReservation_BE.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("PROMOTION_ID");
 
+                    b.Property<long?>("ReservationRoomId")
+                        .HasColumnType("bigint");
+
                     b.Property<decimal>("RoomSubtotal")
                         .HasColumnType("decimal(12,2)")
                         .HasColumnName("ROOM_SUB_TOTAL");
@@ -197,6 +194,8 @@ namespace LodgingReservation_BE.Migrations
 
                     b.HasIndex("PromotionId");
 
+                    b.HasIndex("ReservationRoomId");
+
                     b.HasIndex("UserId");
 
                     b.ToTable("RESERVATION");
@@ -210,26 +209,22 @@ namespace LodgingReservation_BE.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
-                    b.Property<long?>("ExtraServiceId")
-                        .IsRequired()
+                    b.Property<long>("ExtraServiceId")
                         .HasColumnType("bigint")
                         .HasColumnName("EXTRA_SERVICE_ID");
 
                     b.Property<int>("Quantity")
-                        .HasColumnType("integer")
-                        .HasColumnName("QUANTITY");
+                        .HasColumnType("integer");
 
                     b.Property<long>("ReservationId")
                         .HasColumnType("bigint")
                         .HasColumnName("RESERVATION_ID");
 
                     b.Property<decimal>("SubTotal")
-                        .HasColumnType("decimal(12,2)")
-                        .HasColumnName("SUB_TOTAL");
+                        .HasColumnType("decimal(12,2)");
 
                     b.Property<decimal>("UnitPrice")
-                        .HasColumnType("decimal(12,2)")
-                        .HasColumnName("UNIT_PRICE");
+                        .HasColumnType("decimal(12,2)");
 
                     b.HasKey("Id");
 
@@ -237,7 +232,7 @@ namespace LodgingReservation_BE.Migrations
 
                     b.HasIndex("ReservationId");
 
-                    b.ToTable("RESERVATION_ADD_ON");
+                    b.ToTable("ReservationAddOns");
                 });
 
             modelBuilder.Entity("LodgingReservation_BE.Models.ReservationRoom", b =>
@@ -270,7 +265,7 @@ namespace LodgingReservation_BE.Migrations
 
                     b.HasIndex("RoomId");
 
-                    b.ToTable("RESERVATION_ROOM");
+                    b.ToTable("ReservationRooms");
                 });
 
             modelBuilder.Entity("LodgingReservation_BE.Models.Room", b =>
@@ -388,7 +383,12 @@ namespace LodgingReservation_BE.Migrations
                     b.HasOne("LodgingReservation_BE.Models.Promotion", "Promotion")
                         .WithMany("Reservations")
                         .HasForeignKey("PromotionId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("LodgingReservation_BE.Models.ReservationRoom", null)
+                        .WithMany("Reservations")
+                        .HasForeignKey("ReservationRoomId");
 
                     b.HasOne("LodgingReservation_BE.Models.User", "User")
                         .WithMany("Reservations")
@@ -467,6 +467,11 @@ namespace LodgingReservation_BE.Migrations
                     b.Navigation("ReservationAddOns");
 
                     b.Navigation("ReservationRooms");
+                });
+
+            modelBuilder.Entity("LodgingReservation_BE.Models.ReservationRoom", b =>
+                {
+                    b.Navigation("Reservations");
                 });
 
             modelBuilder.Entity("LodgingReservation_BE.Models.Room", b =>

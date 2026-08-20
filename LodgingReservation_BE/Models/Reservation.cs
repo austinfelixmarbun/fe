@@ -27,7 +27,6 @@ namespace LodgingReservation_BE.Models
         public long? PromotionId { get; set; }
         public Promotion? Promotion { get; set; }
 
-
         [Required]
         [Column("CHECK_IN_DATE")]
         public DateTime CheckInDate { get; set; }
@@ -46,7 +45,7 @@ namespace LodgingReservation_BE.Models
         public int TotalNights { get; set; } 
 
         [Required, Column("ROOM_SUB_TOTAL",TypeName = "decimal(12,2)")]
-        public decimal RoomSubtotal { get; internal set; } 
+        public decimal RoomSubtotal { get; set; } 
 
         [Required, Column("LATE_CHECK_OUT_FEE",TypeName = "decimal(12,2)")]
         public decimal LateCheckoutFee { get; set; } 
