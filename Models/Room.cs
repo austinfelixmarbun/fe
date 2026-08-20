@@ -20,7 +20,7 @@ namespace LodgingReservation_BE.Models
         [Required]
         [Column("ROOM_NUMBER")]
         [MaxLength(100)]
-        public string roomNumber { get; set; } = string.Empty;
+        public string RoomNumber { get; set; } = string.Empty;
 
         [Required]
         [Column("STATUS")]

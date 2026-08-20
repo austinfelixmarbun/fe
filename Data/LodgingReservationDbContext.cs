@@ -12,8 +12,8 @@ namespace LodgingReservation_BE.Data
         public DbSet<Payment> Payments { get; set; }
         public DbSet<Promotion> Promotions { get; set; }
         public DbSet<Reservation> Reservations { get; set; }
-        public DbSet<ReservationAddOns> ReservationAddOnss { get; set; }
-        public DbSet<ReservationRoom> ReservationsRooms { get; set; }
+        public DbSet<ReservationAddOn> ReservationAddOns { get; set; }
+        public DbSet<ReservationRoom> ReservationRooms { get; set; }
         public DbSet<Room> Rooms { get; set; }
         public DbSet<RoomType> RoomTypes { get; set; }
         public DbSet<User> Users { get; set; }
@@ -37,7 +37,7 @@ namespace LodgingReservation_BE.Data
                 .HasConversion<string>();
 
             modelBuilder.Entity<Room>()
-                .HasIndex(r => r.roomNumber)
+                .HasIndex(r => r.RoomNumber)
                 .IsUnique();
 
             // RoomType (1) -> Room (N)
@@ -92,16 +92,16 @@ namespace LodgingReservation_BE.Data
 
             // ===== RESERVATION ADD-ONS (pivot Reservation <-> ExtraService) =====
             // Reservation (1) -> ReservationAddOns (N)
-            modelBuilder.Entity<ReservationAddOns>()
+            modelBuilder.Entity<ReservationAddOn>()
                 .HasOne(ra => ra.Reservation)
-                .WithMany(r => r.ReservationAddOnss)
+                .WithMany(r => r.ReservationAddOns)
                 .HasForeignKey(ra => ra.ReservationId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             // ExtraService (1) -> ReservationAddOns (N)
-            modelBuilder.Entity<ReservationAddOns>()
+            modelBuilder.Entity<ReservationAddOn>()
                 .HasOne(ra => ra.ExtraService)
-                .WithMany(es => es.ReservationAddOnss)
+                .WithMany(es => es.ReservationAddOns)
                 .HasForeignKey(ra => ra.ExtraServiceId)
                 .OnDelete(DeleteBehavior.Restrict);
 

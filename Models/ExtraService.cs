@@ -22,6 +22,6 @@ namespace LodgingReservation_BE.Models
         [Column("UNIT_TYPE")]
         public Enum.UnitType Type { get; set; }
 
-        public ICollection<ReservationAddOns> ReservationAddOnss { get; set; } = new List<ReservationAddOns>();
+        public ICollection<ReservationAddOn> ReservationAddOns { get; set; } = new List<ReservationAddOn>();
     }
 }

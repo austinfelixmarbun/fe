@@ -67,6 +67,6 @@ namespace LodgingReservation_BE.Models
 
         public ICollection<Payment> Payments { get; set; } = new List<Payment>();
         public ICollection<ReservationRoom> ReservationRooms { get; set; } = new List<ReservationRoom>();
-        public ICollection<ReservationAddOns> ReservationAddOnss { get; set; } = new List<ReservationAddOns>();
+        public ICollection<ReservationAddOn> ReservationAddOns { get; set; } = new List<ReservationAddOn>();
     }
 }
