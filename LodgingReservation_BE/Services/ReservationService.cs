@@ -49,7 +49,11 @@ namespace LodgingReservation_BE.Services
 
             if (!string.IsNullOrEmpty(status))
             {
-                reservations = reservations.Where(r => r.Status.ToString() == status).ToList();
+                if (!System.Enum.TryParse<ReservationStatus>(status, true, out var parsedStatus))
+                {
+                    throw new ArgumentException($"Status '{status}' tidak valid.");
+                }
+                reservations = reservations.Where(r => r.Status == parsedStatus).ToList();
             }
 
             if (date.HasValue)
@@ -106,7 +110,7 @@ namespace LodgingReservation_BE.Services
                     TotalRoomCost = calculation.RoomSubtotal
                 });
 
-                foreach (var addOn in calculation.AddOnEntities)
+                foreach (var addOn in calculation.AddOns)
                 {
                     addOn.Reservation = reservation;
                     await _reservationAddOnRepository.AddAsync(addOn);
@@ -157,6 +161,8 @@ namespace LodgingReservation_BE.Services
         // PERBAIKAN 4: Menggunakan return type ReservationResponse
         public ReservationResponse ToResponseDto(Reservation reservation)
         {
+            var firstRoom = reservation.ReservationRooms?.FirstOrDefault();
+
             return new ReservationResponse
             {
                 Id = reservation.Id,
@@ -166,8 +172,13 @@ namespace LodgingReservation_BE.Services
                 CheckInDate = reservation.CheckInDate,
                 CheckOutDate = reservation.CheckOutDate,
                 TotalNights = reservation.TotalNights,
+                RoomSubtotal = reservation.RoomSubtotal,
+                AddOnsTotal = reservation.AddOnsTotal,
+                PromoDiscount = reservation.PromoDiscount,
                 GrandTotal = reservation.GrandTotal,
-                Status = reservation.Status.ToString()
+                Status = reservation.Status.ToString(),
+                RoomNumber = firstRoom?.Room?.RoomNumber ?? string.Empty,
+                RoomTypeName = firstRoom?.Room?.RoomType?.Name ?? string.Empty
             };
         }
     }

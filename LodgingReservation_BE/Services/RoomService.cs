@@ -20,7 +20,22 @@ namespace LodgingReservation_BE.Services
 
         public async Task<List<RoomResponse>> GetAllAsync(string? search, int page, int limit)
         {
-            var rooms = await _roomRepository.GetAllAsync();
+            var rooms = await _roomRepository.GetAllAsync("RoomType");
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                rooms = rooms
+                    .Where(r => r.RoomNumber.Contains(search, StringComparison.OrdinalIgnoreCase)
+                             || (r.RoomType?.Name?.Contains(search, StringComparison.OrdinalIgnoreCase) ?? false))
+                    .ToList();
+            }
+            if (page < 1) page = 1;
+            if (limit < 1) limit = 10;
+
+            rooms = rooms
+                .Skip((page - 1) * limit)
+                .Take(limit)
+                .ToList();
 
             return rooms.Select(r => new RoomResponse
             {

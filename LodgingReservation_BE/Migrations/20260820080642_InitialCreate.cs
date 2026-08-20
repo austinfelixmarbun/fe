@@ -97,23 +97,6 @@ namespace LodgingReservation_BE.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "PAYMENT",
-                columns: table => new
-                {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    RESERVATION_ID = table.Column<long>(type: "bigint", nullable: false),
-                    INVOICE_NUMBER = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    AMOUNT_PAID = table.Column<decimal>(type: "numeric(12,2)", nullable: false),
-                    METHOD = table.Column<string>(type: "text", nullable: false),
-                    STATUS = table.Column<string>(type: "text", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PAYMENT", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "RESERVATION",
                 columns: table => new
                 {
@@ -122,7 +105,6 @@ namespace LodgingReservation_BE.Migrations
                     BOOKING_CODE = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: false),
                     USER_ID = table.Column<long>(type: "bigint", nullable: false),
                     PROMOTION_ID = table.Column<long>(type: "bigint", nullable: false),
-                    RESERVATION_ROOM_ID = table.Column<long>(type: "bigint", nullable: false),
                     CHECK_IN_DATE = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     CHECK_OUT_DATE = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     STATUS = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
@@ -146,6 +128,29 @@ namespace LodgingReservation_BE.Migrations
                         name: "FK_RESERVATION_USER_USER_ID",
                         column: x => x.USER_ID,
                         principalTable: "USER",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PAYMENT",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    RESERVATION_ID = table.Column<long>(type: "bigint", nullable: false),
+                    INVOICE_NUMBER = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    AMOUNT_PAID = table.Column<decimal>(type: "numeric(12,2)", nullable: false),
+                    METHOD = table.Column<string>(type: "text", nullable: false),
+                    STATUS = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PAYMENT", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PAYMENT_RESERVATION_RESERVATION_ID",
+                        column: x => x.RESERVATION_ID,
+                        principalTable: "RESERVATION",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -236,11 +241,6 @@ namespace LodgingReservation_BE.Migrations
                 column: "PROMOTION_ID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_RESERVATION_RESERVATION_ROOM_ID",
-                table: "RESERVATION",
-                column: "RESERVATION_ROOM_ID");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_RESERVATION_USER_ID",
                 table: "RESERVATION",
                 column: "USER_ID");
@@ -281,36 +281,19 @@ namespace LodgingReservation_BE.Migrations
                 table: "USER",
                 column: "EMAIL",
                 unique: true);
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_PAYMENT_RESERVATION_RESERVATION_ID",
-                table: "PAYMENT",
-                column: "RESERVATION_ID",
-                principalTable: "RESERVATION",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_RESERVATION_RESERVATION_ROOM_RESERVATION_ROOM_ID",
-                table: "RESERVATION",
-                column: "RESERVATION_ROOM_ID",
-                principalTable: "RESERVATION_ROOM",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_RESERVATION_ROOM_RESERVATION_RESERVATION_ID",
-                table: "RESERVATION_ROOM");
-
             migrationBuilder.DropTable(
                 name: "PAYMENT");
 
             migrationBuilder.DropTable(
                 name: "RESERVATION_ADD_ON");
+
+            migrationBuilder.DropTable(
+                name: "RESERVATION_ROOM");
 
             migrationBuilder.DropTable(
                 name: "EXTRA_SERVICE");
@@ -319,16 +302,13 @@ namespace LodgingReservation_BE.Migrations
                 name: "RESERVATION");
 
             migrationBuilder.DropTable(
+                name: "ROOM");
+
+            migrationBuilder.DropTable(
                 name: "PROMOTION");
 
             migrationBuilder.DropTable(
-                name: "RESERVATION_ROOM");
-
-            migrationBuilder.DropTable(
                 name: "USER");
-
-            migrationBuilder.DropTable(
-                name: "ROOM");
 
             migrationBuilder.DropTable(
                 name: "ROOM_TYPE");

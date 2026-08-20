@@ -26,8 +26,11 @@ namespace LodgingReservation_BE.Services
             var result = new CalculationResult();
 
             // 1. Hitung Total Malam
-            result.TotalNights = (request.CheckOutDate - request.CheckInDate).Days;
-            if (result.TotalNights <= 0) result.TotalNights = 1;
+            if (request.CheckOutDate.Date <= request.CheckInDate.Date)
+            {
+                throw new ArgumentException("Tanggal check-out harus setelah tanggal check-in.");
+            }
+            result.TotalNights = (request.CheckOutDate.Date - request.CheckInDate.Date).Days;
 
             // 2. Hitung Subtotal Kamar
             decimal pricePerNight = room.RoomType?.BasePrice ?? 0;
@@ -59,7 +62,7 @@ namespace LodgingReservation_BE.Services
             if (request.PromotionId.HasValue && request.PromotionId.Value > 0)
             {
                 var promotion = await promotionRepo.GetByIdAsync(request.PromotionId.Value);
-                if (promotion != null && promotion.IsActive && promotion.ValidUntil >= DateTime.Now)
+                if (promotion != null && promotion.IsActive && promotion.ValidUntil >= DateTime.UtcNow)
                 {
                     result.PromotionIdToSave = promotion.Id;
                     decimal calculatedDiscount = result.RoomSubtotal * (promotion.DiscountPercentage / 100);
@@ -70,6 +73,10 @@ namespace LodgingReservation_BE.Services
             }
 
             // 5. Hitung Grand Total
+            if (request.LateCheckoutFee < 0)
+            {
+                throw new ArgumentException("Late checkout fee tidak boleh bernilai negatif.");
+            }
             decimal lateCheckoutFee = request.LateCheckoutFee;
             result.GrandTotal = (result.RoomSubtotal + result.AddOnsTotal + lateCheckoutFee) - result.PromoDiscount;
             if (result.GrandTotal < 0) result.GrandTotal = 0;
