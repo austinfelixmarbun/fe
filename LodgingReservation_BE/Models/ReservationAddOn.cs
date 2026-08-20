@@ -15,11 +15,10 @@ namespace LodgingReservation_BE.Models
         public long ReservationId { get; set; }
         public Reservation? Reservation { get; set; }
 
-        // Foreign Key ke Layanan Tambahan (Extra Services)
         [Required]
         [Column("EXTRA_SERVICE_ID")]
         [ForeignKey(nameof(ExtraService))]
-        public long ExtraServiceId { get; set; }
+        public long? ExtraServiceId { get; set; }
         public ExtraService? ExtraService { get; set; }
 
         [Required]

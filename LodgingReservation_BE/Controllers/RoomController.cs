@@ -29,13 +29,19 @@ namespace LodgingReservation_BE.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateRoom dto)
         {
-            var result = await _roomService.CreateAsync(dto);
-            if (result == null)
+            try
             {
-                return BadRequest(new { message = "Gagal membuat kamar baru." });
+                var result = await _roomService.CreateAsync(dto);
+                if (result == null)
+                {
+                    return BadRequest(new { message = "Gagal membuat kamar baru." });
+                }
+                return CreatedAtAction(nameof(GetAll), new { id = result.Id }, result);
             }
-
-            return CreatedAtAction(nameof(GetAll), new { id = result.Id }, result);
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { status = "error", message = ex.Message });
+            }
         }
     }
 }

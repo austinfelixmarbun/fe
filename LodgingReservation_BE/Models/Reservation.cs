@@ -24,14 +24,9 @@ namespace LodgingReservation_BE.Models
         [Required]
         [Column("PROMOTION_ID")]
         [ForeignKey(nameof(Promotion))]
-        public long PromotionId { get; set; }
+        public long? PromotionId { get; set; }
         public Promotion? Promotion { get; set; }
 
-        [Required]
-        [Column("RESERVATION_ROOM_ID")]
-        [ForeignKey(nameof(ReservationRoom))]
-        public long ReservationRoomId { get; set; }
-        public ReservationRoom? ReservationRoom { get; set; }
 
         [Required]
         [Column("CHECK_IN_DATE")]

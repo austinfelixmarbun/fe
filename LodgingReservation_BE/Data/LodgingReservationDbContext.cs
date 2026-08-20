@@ -73,6 +73,7 @@ namespace LodgingReservation_BE.Data
                 .HasOne(r => r.Promotion)
                 .WithMany(p => p.Reservations)
                 .HasForeignKey(r => r.PromotionId)
+                .IsRequired(false)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // ===== RESERVATION ROOM (pivot Reservation <-> Room) =====

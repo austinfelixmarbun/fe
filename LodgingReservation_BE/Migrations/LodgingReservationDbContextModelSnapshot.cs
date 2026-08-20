@@ -167,13 +167,10 @@ namespace LodgingReservation_BE.Migrations
                         .HasColumnType("decimal(12,2)")
                         .HasColumnName("PROMO_DISCOUNT");
 
-                    b.Property<long>("PromotionId")
+                    b.Property<long?>("PromotionId")
+                        .IsRequired()
                         .HasColumnType("bigint")
                         .HasColumnName("PROMOTION_ID");
-
-                    b.Property<long>("ReservationRoomId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("RESERVATION_ROOM_ID");
 
                     b.Property<decimal>("RoomSubtotal")
                         .HasColumnType("decimal(12,2)")
@@ -200,8 +197,6 @@ namespace LodgingReservation_BE.Migrations
 
                     b.HasIndex("PromotionId");
 
-                    b.HasIndex("ReservationRoomId");
-
                     b.HasIndex("UserId");
 
                     b.ToTable("RESERVATION");
@@ -215,7 +210,8 @@ namespace LodgingReservation_BE.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
-                    b.Property<long>("ExtraServiceId")
+                    b.Property<long?>("ExtraServiceId")
+                        .IsRequired()
                         .HasColumnType("bigint")
                         .HasColumnName("EXTRA_SERVICE_ID");
 
@@ -392,14 +388,7 @@ namespace LodgingReservation_BE.Migrations
                     b.HasOne("LodgingReservation_BE.Models.Promotion", "Promotion")
                         .WithMany("Reservations")
                         .HasForeignKey("PromotionId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("LodgingReservation_BE.Models.ReservationRoom", "ReservationRoom")
-                        .WithMany("Reservations")
-                        .HasForeignKey("ReservationRoomId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("LodgingReservation_BE.Models.User", "User")
                         .WithMany("Reservations")
@@ -408,8 +397,6 @@ namespace LodgingReservation_BE.Migrations
                         .IsRequired();
 
                     b.Navigation("Promotion");
-
-                    b.Navigation("ReservationRoom");
 
                     b.Navigation("User");
                 });
@@ -480,11 +467,6 @@ namespace LodgingReservation_BE.Migrations
                     b.Navigation("ReservationAddOns");
 
                     b.Navigation("ReservationRooms");
-                });
-
-            modelBuilder.Entity("LodgingReservation_BE.Models.ReservationRoom", b =>
-                {
-                    b.Navigation("Reservations");
                 });
 
             modelBuilder.Entity("LodgingReservation_BE.Models.Room", b =>
