@@ -111,3 +111,4 @@ C:\training\LodgingReservation\LodgingReservation_BE\LodgingReservation_BE\obj\D
 C:\training\LodgingReservation\LodgingReservation_BE\LodgingReservation_BE\obj\Debug\net8.0\LodgingReservation_BE.pdb
 C:\training\LodgingReservation\LodgingReservation_BE\LodgingReservation_BE\obj\Debug\net8.0\LodgingReservation_BE.genruntimeconfig.cache
 C:\training\LodgingReservation\LodgingReservation_BE\LodgingReservation_BE\obj\Debug\net8.0\ref\LodgingReservation_BE.dll
+C:\training\LodgingReservation\LodgingReservation_BE\LodgingReservation_BE\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt

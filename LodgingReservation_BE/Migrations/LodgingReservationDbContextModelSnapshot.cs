@@ -69,7 +69,8 @@ namespace LodgingReservation_BE.Migrations
 
                     b.Property<string>("Method")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("METHOD");
 
                     b.Property<long>("ReservationId")
                         .HasColumnType("bigint")
@@ -77,7 +78,8 @@ namespace LodgingReservation_BE.Migrations
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("STATUS");
 
                     b.HasKey("Id");
 
@@ -218,17 +220,20 @@ namespace LodgingReservation_BE.Migrations
                         .HasColumnName("EXTRA_SERVICE_ID");
 
                     b.Property<int>("Quantity")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("QUANTITY");
 
                     b.Property<long>("ReservationId")
                         .HasColumnType("bigint")
                         .HasColumnName("RESERVATION_ID");
 
                     b.Property<decimal>("SubTotal")
-                        .HasColumnType("decimal(12,2)");
+                        .HasColumnType("decimal(12,2)")
+                        .HasColumnName("SUB_TOTAL");
 
                     b.Property<decimal>("UnitPrice")
-                        .HasColumnType("decimal(12,2)");
+                        .HasColumnType("decimal(12,2)")
+                        .HasColumnName("UNIT_PRICE");
 
                     b.HasKey("Id");
 
@@ -236,7 +241,7 @@ namespace LodgingReservation_BE.Migrations
 
                     b.HasIndex("ReservationId");
 
-                    b.ToTable("ReservationAddOns");
+                    b.ToTable("RESERVATION_ADD_ON");
                 });
 
             modelBuilder.Entity("LodgingReservation_BE.Models.ReservationRoom", b =>
@@ -269,7 +274,7 @@ namespace LodgingReservation_BE.Migrations
 
                     b.HasIndex("RoomId");
 
-                    b.ToTable("ReservationRooms");
+                    b.ToTable("RESERVATION_ROOM");
                 });
 
             modelBuilder.Entity("LodgingReservation_BE.Models.Room", b =>

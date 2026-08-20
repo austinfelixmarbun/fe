@@ -105,8 +105,8 @@ namespace LodgingReservation_BE.Migrations
                     RESERVATION_ID = table.Column<long>(type: "bigint", nullable: false),
                     INVOICE_NUMBER = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     AMOUNT_PAID = table.Column<decimal>(type: "numeric(12,2)", nullable: false),
-                    Method = table.Column<string>(type: "text", nullable: false),
-                    Status = table.Column<string>(type: "text", nullable: false)
+                    METHOD = table.Column<string>(type: "text", nullable: false),
+                    STATUS = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -151,28 +151,28 @@ namespace LodgingReservation_BE.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ReservationAddOns",
+                name: "RESERVATION_ADD_ON",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     RESERVATION_ID = table.Column<long>(type: "bigint", nullable: false),
                     EXTRA_SERVICE_ID = table.Column<long>(type: "bigint", nullable: false),
-                    Quantity = table.Column<int>(type: "integer", nullable: false),
-                    UnitPrice = table.Column<decimal>(type: "numeric(12,2)", nullable: false),
-                    SubTotal = table.Column<decimal>(type: "numeric(12,2)", nullable: false)
+                    QUANTITY = table.Column<int>(type: "integer", nullable: false),
+                    UNIT_PRICE = table.Column<decimal>(type: "numeric(12,2)", nullable: false),
+                    SUB_TOTAL = table.Column<decimal>(type: "numeric(12,2)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ReservationAddOns", x => x.Id);
+                    table.PrimaryKey("PK_RESERVATION_ADD_ON", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ReservationAddOns_EXTRA_SERVICE_EXTRA_SERVICE_ID",
+                        name: "FK_RESERVATION_ADD_ON_EXTRA_SERVICE_EXTRA_SERVICE_ID",
                         column: x => x.EXTRA_SERVICE_ID,
                         principalTable: "EXTRA_SERVICE",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_ReservationAddOns_RESERVATION_RESERVATION_ID",
+                        name: "FK_RESERVATION_ADD_ON_RESERVATION_RESERVATION_ID",
                         column: x => x.RESERVATION_ID,
                         principalTable: "RESERVATION",
                         principalColumn: "Id",
@@ -180,7 +180,7 @@ namespace LodgingReservation_BE.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ReservationRooms",
+                name: "RESERVATION_ROOM",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
@@ -192,15 +192,15 @@ namespace LodgingReservation_BE.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ReservationRooms", x => x.Id);
+                    table.PrimaryKey("PK_RESERVATION_ROOM", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ReservationRooms_RESERVATION_RESERVATION_ID",
+                        name: "FK_RESERVATION_ROOM_RESERVATION_RESERVATION_ID",
                         column: x => x.RESERVATION_ID,
                         principalTable: "RESERVATION",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ReservationRooms_ROOM_ROOM_ID",
+                        name: "FK_RESERVATION_ROOM_ROOM_ROOM_ID",
                         column: x => x.ROOM_ID,
                         principalTable: "ROOM",
                         principalColumn: "Id",
@@ -246,23 +246,23 @@ namespace LodgingReservation_BE.Migrations
                 column: "USER_ID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ReservationAddOns_EXTRA_SERVICE_ID",
-                table: "ReservationAddOns",
+                name: "IX_RESERVATION_ADD_ON_EXTRA_SERVICE_ID",
+                table: "RESERVATION_ADD_ON",
                 column: "EXTRA_SERVICE_ID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ReservationAddOns_RESERVATION_ID",
-                table: "ReservationAddOns",
+                name: "IX_RESERVATION_ADD_ON_RESERVATION_ID",
+                table: "RESERVATION_ADD_ON",
                 column: "RESERVATION_ID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ReservationRooms_RESERVATION_ID",
-                table: "ReservationRooms",
+                name: "IX_RESERVATION_ROOM_RESERVATION_ID",
+                table: "RESERVATION_ROOM",
                 column: "RESERVATION_ID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ReservationRooms_ROOM_ID",
-                table: "ReservationRooms",
+                name: "IX_RESERVATION_ROOM_ROOM_ID",
+                table: "RESERVATION_ROOM",
                 column: "ROOM_ID");
 
             migrationBuilder.CreateIndex(
@@ -291,10 +291,10 @@ namespace LodgingReservation_BE.Migrations
                 onDelete: ReferentialAction.Restrict);
 
             migrationBuilder.AddForeignKey(
-                name: "FK_RESERVATION_ReservationRooms_RESERVATION_ROOM_ID",
+                name: "FK_RESERVATION_RESERVATION_ROOM_RESERVATION_ROOM_ID",
                 table: "RESERVATION",
                 column: "RESERVATION_ROOM_ID",
-                principalTable: "ReservationRooms",
+                principalTable: "RESERVATION_ROOM",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Cascade);
         }
@@ -303,14 +303,14 @@ namespace LodgingReservation_BE.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
-                name: "FK_ReservationRooms_RESERVATION_RESERVATION_ID",
-                table: "ReservationRooms");
+                name: "FK_RESERVATION_ROOM_RESERVATION_RESERVATION_ID",
+                table: "RESERVATION_ROOM");
 
             migrationBuilder.DropTable(
                 name: "PAYMENT");
 
             migrationBuilder.DropTable(
-                name: "ReservationAddOns");
+                name: "RESERVATION_ADD_ON");
 
             migrationBuilder.DropTable(
                 name: "EXTRA_SERVICE");
@@ -322,7 +322,7 @@ namespace LodgingReservation_BE.Migrations
                 name: "PROMOTION");
 
             migrationBuilder.DropTable(
-                name: "ReservationRooms");
+                name: "RESERVATION_ROOM");
 
             migrationBuilder.DropTable(
                 name: "USER");

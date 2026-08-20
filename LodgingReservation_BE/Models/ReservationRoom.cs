@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LodgingReservation_BE.Models
 {
+    [Table("RESERVATION_ROOM")]
     public class ReservationRoom
     {
         [Key]
