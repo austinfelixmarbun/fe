@@ -8,5 +8,6 @@ namespace LodgingReservation_BE.Services
         Task<List<RoomResponse>> GetAllAsync(string? search, int page, int limit);
         Task<RoomResponse?> CreateAsync(CreateRoom dto);
         Task<Room?> GetByIdAsync(long id);
+        Task<List<AvailableRoomTypeDto>> GetAvailableRoomTypesAsync(DateTime checkIn, DateTime checkOut, int guests);
     }
 }

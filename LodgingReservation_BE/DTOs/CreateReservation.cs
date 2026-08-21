@@ -6,9 +6,9 @@ namespace LodgingReservation_BE.DTOs
     {
         public long? PromotionId { get; set; }
 
-        [Required(ErrorMessage = "RoomId wajib diisi")]
-        [Range(1, long.MaxValue, ErrorMessage = "RoomId tidak valid")]
-        public long RoomId { get; set; }
+        [Required(ErrorMessage = "RoomIds wajib diisi")]
+        [MinLength(1, ErrorMessage = "Pilih minimal 1 kamar.")]
+        public List<long> RoomIds { get; set; } = new();
 
         [Required(ErrorMessage = "CheckInDate wajib diisi")]
         public DateTime CheckInDate { get; set; }

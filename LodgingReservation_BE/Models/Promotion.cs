@@ -26,6 +26,10 @@ namespace LodgingReservation_BE.Models
         [Column("IS_ACTIVE")]
         public bool IsActive { get; set; }
 
+        [Required]
+        [Column("MAX_DISCOUNT_CAP", TypeName = "decimal(12,2)")]
+        public decimal MaxDiscountCap { get; set; }
+
         public ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
     }
 }

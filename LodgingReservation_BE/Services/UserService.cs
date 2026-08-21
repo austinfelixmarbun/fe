@@ -11,10 +11,10 @@ namespace LodgingReservation_BE.Services
 {
     public class UserService : IUserService
     {
-        private readonly ApplicationDbContext _context;
+        private readonly LodgingReservationDbContext _context;
         private readonly IConfiguration _config;
 
-        public UserService(ApplicationDbContext context, IConfiguration config)
+        public UserService(LodgingReservationDbContext context, IConfiguration config)
         {
             _context = context;
             _config = config;
@@ -22,77 +22,66 @@ namespace LodgingReservation_BE.Services
 
         public async Task<AuthResponseDto> RegisterAsync(RegisterRequestDto dto)
         {
-            if (await _context.Users.AnyAsync(u => u.Email == dto.Email))
+            if (await _context.Users.AnyAsync(u => u.Email == dto.Email && !u.IsDeleted))
             {
                 throw new InvalidOperationException("Email is already registered.");
             }
 
             var user = new User
             {
-                FullName = dto.FullName,
+                Nama = dto.Nama,
                 Email = dto.Email,
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
+                Password = BCrypt.Net.BCrypt.HashPassword(dto.Password),
                 PhoneNumber = dto.PhoneNumber,
-                Role = "Guest"
+                IsDeleted = false
             };
 
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
             var token = GenerateJwtToken(user);
-            return new AuthResponseDto
-            {
-                Token = token,
-                FullName = user.FullName,
-                Email = user.Email,
-            };
+            return new AuthResponseDto(token, user.Nama, user.Email);
         }
 
         public async Task<AuthResponseDto> LoginAsync(LoginRequestDto dto)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == dto.Email && !u.IsDeleted);
             
-            if (user == null || string.IsNullOrEmpty(user.PasswordHash))
+            if (user == null || string.IsNullOrEmpty(user.Password))
             {
                 throw new UnauthorizedAccessException("Invalid email or password.");
             }
 
-            bool isPasswordValid = BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash);
+            bool isPasswordValid = BCrypt.Net.BCrypt.Verify(dto.Password, user.Password);
             if (!isPasswordValid)
             {
                 throw new UnauthorizedAccessException("Invalid email or password.");
             }
 
             var token = GenerateJwtToken(user);
-            return new AuthResponseDto
-            {
-                Token = token,
-                FullName = user.FullName,
-                Email = user.Email,
-            };
+            return new AuthResponseDto(token, user.Nama, user.Email);
         }
 
         public async Task<UserProfileDto?> GetProfileAsync(long userId)
         {
-            var user = await _context.Users.FindAsync(userId);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId && !u.IsDeleted);
             if (user == null) return null;
 
             return new UserProfileDto
             {
                 Id = user.Id,
-                FullName = user.FullName,
+                Nama = user.Nama,
                 Email = user.Email,
                 PhoneNumber = user.PhoneNumber,
-                Role = user.Role
             };
         }
 
         public async Task<UserProfileDto?> UpdateProfileAsync(long userId, UpdateProfileDto dto)
         {
-            var user = await _context.Users.FindAsync(userId);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId && !u.IsDeleted);
             if (user == null) return null;
 
-            user.FullName = dto.FullName;
+            user.Nama = dto.Nama;
             user.PhoneNumber = dto.PhoneNumber;
 
             await _context.SaveChangesAsync();
@@ -100,16 +89,15 @@ namespace LodgingReservation_BE.Services
             return new UserProfileDto
             {
                 Id = user.Id,
-                FullName = user.FullName,
+                Nama = user.Nama,
                 Email = user.Email,
                 PhoneNumber = user.PhoneNumber,
-                Role = user.Role
             };
         }
 
         public async Task<bool> UpdatePhoneNumberAsync(long userId, string phoneNumber)
         {
-            var user = await _context.Users.FindAsync(userId);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId && !u.IsDeleted);
             if (user == null) return false;
 
             user.PhoneNumber = phoneNumber;
@@ -119,36 +107,47 @@ namespace LodgingReservation_BE.Services
 
         public async Task<bool> ChangePasswordAsync(long userId, ChangePasswordDto dto)
         {
-            var user = await _context.Users.FindAsync(userId);
-            if (user == null || string.IsNullOrEmpty(user.PasswordHash)) return false;
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId && !u.IsDeleted);
+            if (user == null || string.IsNullOrEmpty(user.Password)) return false;
 
-            if (!BCrypt.Net.BCrypt.Verify(dto.CurrentPassword, user.PasswordHash))
+            if (!BCrypt.Net.BCrypt.Verify(dto.CurrentPassword, user.Password))
             {
                 throw new InvalidOperationException("Current password does not match.");
             }
 
-            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+            user.Password = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> DeleteAsync(long userId)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId && !u.IsDeleted);
+            if (user == null) return false;
+
+            user.IsDeleted = true;
             await _context.SaveChangesAsync();
             return true;
         }
 
         private string GenerateJwtToken(User user)
         {
-            var jwtKey = _config["Jwt:Key"] ?? "DefaultSecretKey12345678901234567890";
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
+            var secret = _config["JwtSettings:SecretKey"] ?? "123456789123456789123456789123456789";
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var claims = new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Name, user.Nama),
                 new Claim(ClaimTypes.Email, user.Email),
             };
 
             var token = new JwtSecurityToken(
-                issuer: _config["Jwt:Issuer"],
-                audience: _config["Jwt:Audience"],
+                issuer: _config["JwtSettings:Issuer"],
+                audience: _config["JwtSettings:Audience"],
                 claims: claims,
-                expires: DateTime.UtcNow.AddDays(7),
+                expires: DateTime.UtcNow.AddHours(8),
                 signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(token);

@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace LodgingReservation_BE.Migrations
 {
     [DbContext(typeof(LodgingReservationDbContext))]
-    [Migration("20260820081346_InitialCreate")]
+    [Migration("20260821002321_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -107,6 +107,10 @@ namespace LodgingReservation_BE.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean")
                         .HasColumnName("IS_ACTIVE");
+
+                    b.Property<decimal>("MaxDiscountCap")
+                        .HasColumnType("decimal(12,2)")
+                        .HasColumnName("MAX_DISCOUNT_CAP");
 
                     b.Property<string>("PromoCode")
                         .IsRequired()
@@ -350,6 +354,10 @@ namespace LodgingReservation_BE.Migrations
                         .HasColumnType("character varying(100)")
                         .HasColumnName("EMAIL");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("IS_DELETED");
+
                     b.Property<string>("Nama")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -361,6 +369,11 @@ namespace LodgingReservation_BE.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)")
                         .HasColumnName("PASSWORD");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("PHONE_NUMBER");
 
                     b.HasKey("Id");
 

@@ -105,6 +105,10 @@ namespace LodgingReservation_BE.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("IS_ACTIVE");
 
+                    b.Property<decimal>("MaxDiscountCap")
+                        .HasColumnType("decimal(12,2)")
+                        .HasColumnName("MAX_DISCOUNT_CAP");
+
                     b.Property<string>("PromoCode")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -347,6 +351,10 @@ namespace LodgingReservation_BE.Migrations
                         .HasColumnType("character varying(100)")
                         .HasColumnName("EMAIL");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("IS_DELETED");
+
                     b.Property<string>("Nama")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -358,6 +366,11 @@ namespace LodgingReservation_BE.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)")
                         .HasColumnName("PASSWORD");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("PHONE_NUMBER");
 
                     b.HasKey("Id");
 

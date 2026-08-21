@@ -1,72 +1,102 @@
-﻿using LodgingReservation_BE.Services;
+﻿using LodgingReservation_BE.Models;
+using LodgingReservation_BE.Models.Enum;
+using LodgingReservation_BE.Repositories;
 using LodgingReservation_BE.DTOs;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
 
-namespace LodgingReservation_BE.Controllers
+namespace LodgingReservation_BE.Services
 {
-        [ApiController]
-        [Route("api/[controller]")]
-        public class ReservationController : ControllerBase
+    public class ReservationCalculator
+    {
+        public class CalculationResult
         {
-            private readonly IReservationService _reservationService;
-
-            public ReservationController(IReservationService reservationService)
-            {
-                _reservationService = reservationService;
-            }
-
-            [HttpGet] 
-            public async Task<IActionResult> GetReservations([FromQuery] string? status, [FromQuery] DateTime? date)
-            {
-                try
-                {
-                    var reservations = await _reservationService.GetAllAsync(status, date);
-                    var response = reservations.Select(_reservationService.ToResponseDto).ToList();
-                    return Ok(response);
-                }
-                catch (ArgumentException ex) 
-                {
-                    return BadRequest(new { status = "error", message = ex.Message });
-                }
-            }
-
-            [HttpGet("{id:long}")] 
-            public async Task<IActionResult> GetReservation(long id)
-            {
-                var reservation = await _reservationService.GetByIdAsync(id);
-                if (reservation == null) return NotFound();
-                return Ok(_reservationService.ToResponseDto(reservation));
-            }
-
-            [HttpPost]
-            [Authorize]
-            public async Task<IActionResult> Create([FromBody] CreateReservation dto)
-            {
-            var userIdClaim = User.FindFirst("userId");
-            if (userIdClaim == null || !long.TryParse(userIdClaim.Value, out var userId))
-            {
-                return Unauthorized(new { status = "error", message = "Token tidak valid atau userId tidak ditemukan." });
-            }
-
-            try
-            {
-                ReservationResponse? result = await _reservationService.CreateAsync(dto, userId);
-                return Created($"/api/reservations/{result!.Id}", result);
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(new { status = "error", message = ex.Message });
-            }
-            catch (InvalidOperationException ex)
-            {
-                return Conflict(new { status = "error", message = ex.Message });
-            }
-            catch (Exception)
-            {
-                return StatusCode(500, new { status = "error", message = "Terjadi kesalahan pada server." });
-            }
-        }
+            public int TotalNights { get; set; }
+            public decimal RoomSubtotal { get; set; }
+            public decimal AddOnsTotal { get; set; }
+            public decimal PromoDiscount { get; set; }
+            public decimal GrandTotal { get; set; }
+            public long? PromotionIdToSave { get; set; } 
+            public List<ReservationAddOn> AddOns { get; set; } = new();
         }
 
+        public async Task<CalculationResult> CalculateAsync(
+            CreateReservation request,
+            List<Room> rooms, 
+            IRepository<ExtraService> extraServiceRepo,
+            IRepository<Promotion> promotionRepo)
+        {
+            var result = new CalculationResult();
+
+            if (request.CheckOutDate.Date <= request.CheckInDate.Date)
+            {
+                throw new ArgumentException("Tanggal check-out harus setelah tanggal check-in.");
+            }
+            result.TotalNights = (request.CheckOutDate.Date - request.CheckInDate.Date).Days;
+
+            decimal totalRoomNightCost = 0;
+            foreach (var room in rooms)
+            {
+                decimal roomPrice = room.RoomType?.BasePrice ?? 0;
+                totalRoomNightCost += roomPrice * result.TotalNights;
+            }
+            result.RoomSubtotal = totalRoomNightCost;
+
+            if (request.AddOns != null && request.AddOns.Any())
+            {
+                foreach (var item in request.AddOns)
+                {
+                    var extraService = await extraServiceRepo.GetByIdAsync(item.ExtraServiceId);
+                    if (extraService != null)
+                    {
+                        decimal subTotalAddOn = 0;
+
+                        if (extraService.Type == UnitType.NIGHT)
+                        {
+                            subTotalAddOn = extraService.Price * item.Quantity * result.TotalNights;
+                        }
+                        else
+                        {
+                            subTotalAddOn = extraService.Price * item.Quantity;
+                        }
+
+                        result.AddOnsTotal += subTotalAddOn;
+
+                        result.AddOns.Add(new ReservationAddOn
+                        {
+                            ExtraServiceId = extraService.Id,
+                            Quantity = item.Quantity,
+                            UnitPrice = extraService.Price,
+                            SubTotal = subTotalAddOn
+                        });
+                    }
+                }
+            }
+
+            if (request.PromotionId.HasValue && request.PromotionId.Value > 0)
+            {
+                var promotion = await promotionRepo.GetByIdAsync(request.PromotionId.Value);
+                if (promotion != null && promotion.IsActive && promotion.ValidUntil.Date >= DateTime.UtcNow.Date)
+                {
+                    result.PromotionIdToSave = promotion.Id;
+                    
+                    decimal calculatedDiscount = result.RoomSubtotal * (promotion.DiscountPercentage / 100);
+
+                    result.PromoDiscount = calculatedDiscount > promotion.MaxDiscountCap 
+                        ? promotion.MaxDiscountCap 
+                        : calculatedDiscount;
+                }
+            }
+
+            if (request.LateCheckoutFee < 0)
+            {
+                throw new ArgumentException("Late checkout fee tidak boleh bernilai negatif.");
+            }
+            decimal lateCheckoutFee = request.LateCheckoutFee;
+            
+            result.GrandTotal = (result.RoomSubtotal + result.AddOnsTotal + lateCheckoutFee) - result.PromoDiscount;
+            
+            if (result.GrandTotal < 0) result.GrandTotal = 0;
+
+            return result;
+        }
+    }
 }

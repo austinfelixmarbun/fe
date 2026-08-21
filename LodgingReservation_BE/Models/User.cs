@@ -29,6 +29,10 @@ namespace LodgingReservation_BE.Models
         [Phone]
         public string? PhoneNumber {get;set;}
 
+        [Required]
+        [Column("IS_DELETED")]
+        public bool IsDeleted { get; set; } = false;
+
         public ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
     }
 }

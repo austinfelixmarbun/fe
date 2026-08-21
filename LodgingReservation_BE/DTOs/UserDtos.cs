@@ -6,7 +6,7 @@ namespace LodgingReservation_BE.DTOs
     public class UserProfileDto
     {
         public long Id { get; set; }
-        public string FullName { get; set; } = string.Empty;
+        public string Nama { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string? PhoneNumber { get; set; }
         public string Role { get; set; } = string.Empty;
@@ -16,7 +16,7 @@ namespace LodgingReservation_BE.DTOs
     {
         [Required(ErrorMessage = "Full name is required")]
         [StringLength(100)]
-        public string FullName { get; set; } = string.Empty;
+        public string Nama { get; set; } = string.Empty;
 
         [Phone(ErrorMessage = "Invalid phone number format")]
         public string? PhoneNumber { get; set; }
